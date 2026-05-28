@@ -14,8 +14,6 @@ cmake_minimum_required(VERSION 3.30)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
-project(${ProjectName})
-include(../../common.cmake)
 
 find_program(WSL NAMES powershell.exe)
 
@@ -39,7 +37,8 @@ if ( WSL )
     add_compile_options(/Zc:__cplusplus)
 endif ()
 
-
+project(${ProjectName})
+include(../../common.cmake)
 
 add_executable(${currentTarget}
     ${subdir}/test.cpp
