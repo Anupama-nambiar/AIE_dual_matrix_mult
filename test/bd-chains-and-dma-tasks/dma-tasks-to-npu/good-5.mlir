@@ -1,0 +1,37 @@
+//
+// This file is licensed under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+// (c) Copyright 2024 AMD Inc.
+
+// RUN: aie-opt --aie-assign-buffer-addresses --aie-dma-tasks-to-npu %s | FileCheck %s
+
+// This test ensures that a chained buffer descriptor configuration in the runtime
+// sequence gets lowered to the correct NPU instruction sequence register write
+// instructions to set all BDs addresses to their correct value when combined with
+// the automatic buffer address allocation.
+
+module {
+  aie.device(npu1) {
+    %tile_0_0 = aie.tile(0, 0)
+    %tile_0_1 = aie.tile(0, 1)
+    %tile_0_2 = aie.tile(0, 2)
+    // CHECK: %{{.*}} = aie.buffer(%{{.*}}tile_0_1) {address = [[ADDR1:[0-9]+]] {{.*}}}
+    %buf0 = aie.buffer(%tile_0_1) : memref<32xi8>
+    // CHECK: %{{.*}} = aie.buffer(%{{.*}}tile_0_1) {address = [[ADDR2:[0-9]+]] {{.*}}}
+    %buf1 = aie.buffer(%tile_0_1) : memref<32xi8>
+
+    aie.runtime_sequence(%arg0: memref<32xi8>) {
+      %t1 = aiex.dma_configure_task(%tile_0_1, MM2S, 0) {
+          // CHECK: {address = 1703940 : ui32, mask = 524287 : ui32, value = 1 : ui32}
+          aie.dma_bd(%buf0 : memref<32xi8>, 4, 16) {bd_id = 0 : i32}
+          aie.next_bd ^bd2
+        ^bd2:
+          // CHECK: aiex.npu.maskwrite32 {address = 1703972 : ui32, mask = 524287 : ui32, value = 16385 : ui32}
+          aie.dma_bd(%buf1 : memref<32xi8>, 4, 16) {bd_id = 1 : i32}
+          aie.end
+      }
+    }
+  }
+}
