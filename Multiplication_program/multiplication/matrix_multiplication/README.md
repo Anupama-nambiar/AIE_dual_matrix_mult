@@ -7,6 +7,7 @@
 // Copyright (C) 2024, Advanced Micro Devices, Inc.
 // 
 //===----------------------------------------------------------------------===//-->
+**NOTE** Make sure to walk through the initial Setup to ensure that all paths are set correctly and prevent any potential errors. 
 
 # Matrix Multiplication
 
