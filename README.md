@@ -120,7 +120,7 @@ xrt-examine
     > ```bash
     > python3 -m pip install --upgrade cmake
     > ```
-    > If it is already installed but not being used yet, again update the path
+    > If it is already installed the correct version but it is not being accessed correctly, again update the path
     ```bash
       export PATH=/opt/cmake-3.30/bin:$PATH 
     ```
