@@ -65,14 +65,13 @@ def main():
             "parallel on NPU's 4x4 AI Engine array, each using 2 columns."
         ),
     )
-    # Core dims — passed by Makefile via -M -K -N -m -k -n
+    # Core dimensions — passed by Makefile via -M -K -N -m -k -n args
     argparser.add_argument("-M", type=int, default=512)
     argparser.add_argument("-K", type=int, default=512)
     argparser.add_argument("-N", type=int, default=512)
     argparser.add_argument("-m", type=int, default=64)
     argparser.add_argument("-k", type=int, default=64)
     argparser.add_argument("-n", type=int, default=32)
-    # Other args
     argparser.add_argument("--b-col-maj", type=int, choices=[0, 1], default=0)
     argparser.add_argument("--c-col-maj", type=int, choices=[0, 1], default=0)
     argparser.add_argument("--scalar",    type=bool, default=False)
@@ -154,8 +153,7 @@ def my_dual_matmul(
     M0, K0, N0, m0, k0, n0 = prog_dims[0]
     M1, K1, N1, m1, k1, n1 = prog_dims[1]
 
-    # Combined buffer sizes (avoids aiecc.py merging same-typed same-sized buffers
-    # into the same bo slot, which causes DMA deadlocks).
+    # Using Combined buffers (avoids aiecc.py merging same-typed same-sized buffers
     # Layout: A_combined = [A0 | A1], B_combined = [B0 | B1], C_combined = [C0 | C1]
     A0_elems = M0 * K0
     A1_elems = M1 * K1
@@ -171,9 +169,9 @@ def my_dual_matmul(
     @device(AIEDevice.npu1)
     def device_body():
         tiles      = [[tile(col, row) for col in range(4)] for row in range(6)]
-        shim_tiles = tiles[0]
-        mem_tiles  = tiles[1]
-        core_tiles = tiles[2:]
+        shim_tiles = tiles[0] #row 0 is shim
+        mem_tiles  = tiles[1] #row 1 is mem tile
+        core_tiles = tiles[2:] #row 2 and beyond are the computation tiles
 
         scalar_suffix = "_scalar" if use_scalar else ""
         _m, _k, _n = prog_dims[0][3], prog_dims[0][4], prog_dims[0][5]
