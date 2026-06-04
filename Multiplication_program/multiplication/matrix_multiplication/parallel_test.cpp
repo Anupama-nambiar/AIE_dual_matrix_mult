@@ -148,14 +148,14 @@ int main(int argc, const char *argv[]) {
   C_DATATYPE *bufC_combined = bo_c_combined.map<C_DATATYPE *>();
 
   A_DATATYPE *bufA0 = bufA_combined;
-  A_DATATYPE *bufA1 = bufA_combined + A0_ELEMS;
+  A_DATATYPE *bufA1 = bufA_combined + A0_ELEMS; //setting the offset for the buffer of the second program Matrix A
   B_DATATYPE *bufB0 = bufB_combined;
-  B_DATATYPE *bufB1 = bufB_combined + B0_ELEMS;
+  B_DATATYPE *bufB1 = bufB_combined + B0_ELEMS; //setting the offset for the buffer of the second program Matrix B
   C_DATATYPE *bufC0 = bufC_combined;
-  C_DATATYPE *bufC1 = bufC_combined + C0_ELEMS;
+  C_DATATYPE *bufC1 = bufC_combined + C0_ELEMS; //setting the offset for the buffer of the second program Matrix C
 
   std::vector<A_DATATYPE> AVec(A0_ELEMS), AVec1(A1_ELEMS);
-  // Diagonal (change to all zeroes or all ones as needed)
+  // Diagonal input (change to all zeroes or all ones as needed)
   for (int i = 0; i < A0_ELEMS; i++)
     AVec[i]  = (i % N == i / N) ? 1.0 : 0.0;
   for (int i = 0; i < A1_ELEMS; i++)
@@ -164,12 +164,12 @@ int main(int argc, const char *argv[]) {
   memcpy(bufA1, AVec1.data(), A1_ELEMS * sizeof(A_DATATYPE));
 
   std::vector<B_DATATYPE> BVec(B0_ELEMS), BVec1(B1_ELEMS);
-  // Diagonal (change to all zeroes or all ones as needed)
+  // Diagonal input (change to all zeroes or all ones as needed)
   for (int i = 0; i < B0_ELEMS; i++)
     BVec[i]  = (i % N == i / N) ? 1.0 : 0.0;
   for (int i = 0; i < B1_ELEMS; i++)
     BVec1[i] = (i % N == i / N) ? 1.0 : 0.0;
-  memcpy(bufB0, BVec.data(),  B0_ELEMS * sizeof(B_DATATYPE));
+  memcpy(bufB0, BVec.data(),  B0_ELEMS * sizeof(B_DATATYPE)); //copying the data over to the allocated buffer space 
   memcpy(bufB1, BVec1.data(), B1_ELEMS * sizeof(B_DATATYPE));
 
   memset(bufC0, 0, C0_ELEMS * sizeof(C_DATATYPE));
