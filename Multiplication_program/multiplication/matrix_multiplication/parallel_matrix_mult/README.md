@@ -164,6 +164,8 @@ The following ObjectFIFOs are created **per program** (named with a `p{prog_idx}
 
 - **`C_L2L3_p{i}`** (one per column): Moves the assembled output block from the memory tile back to the shim tile and out to the host, transforming from `r`×`t` blocks back into row-major layout.
 
+**Note**: The buffers generated in each case is located on the consumer side's local memory. Except the shim tile since the Shim is majorly a pathway or a controller that moves data to/from the DRAM and has no actual SRAM of its own. 
+
 #### Data Layout Transformations
 
 For matrix `A`, the `A_L2L1` FIFO re-lays out each `m`×`k` row-major tile into contiguous `r`×`s` blocks via these wrap/stride pairs:
